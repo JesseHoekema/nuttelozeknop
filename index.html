@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nutteloze Knop</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 99%;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9e9e9;
+        color: var(--text);
+      }
+
+      .center-card {
+        width: min(560px, 90vw);
+        text-align: center;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      button {
+        padding: 0.9rem 3rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+      p {
+        margin: 4px;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center-card">
+      <h1 id="headline">Klik op deze knop om op een knop te klikken</h1>
+      <button id="big-button" onclick="buttonClicked()">Knop</button>
+      <p id="nope">Laat Mij</p>
+    </div>
+    <script>
+      const headline = document.getElementById("headline");
+      const nope = document.getElementById("nope");
+      const bigButton = document.getElementById("big-button");
+      let knopCount = 0;
+      let followMouse = false;
+
+      // Mouse following functionality with smooth chase
+      let mouseFollowActive = false;
+      let mouseX = 0;
+      let mouseY = 0;
+      let buttonX = window.innerWidth / 2;
+      let buttonY = window.innerHeight / 2;
+      let smallButtons = [];
+
+      document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function spawnSmallButtons() {
+        for (let i = 0; i < 30; i++) {
+          const btn = document.createElement("button");
+          btn.textContent = "Knop";
+          btn.style.padding = "0.5rem 1.5rem";
+          btn.style.fontSize = "0.8rem";
+          btn.style.position = "fixed";
+          btn.style.zIndex = "1000";
+          btn.onclick = buttonClicked;
+          document.body.appendChild(btn);
+
+          smallButtons.push({
+            element: btn,
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 6, // Random velocity X
+            vy: (Math.random() - 0.5) * 6, // Random velocity Y
+          });
+        }
+      }
+
+      function animateButton() {
+        if (mouseFollowActive) {
+          // Animate main button
+          const speed = 0.02;
+          const offsetX = bigButton.offsetWidth / 2;
+          const offsetY = bigButton.offsetHeight / 2;
+
+          buttonX += (mouseX - offsetX - buttonX) * speed;
+          buttonY += (mouseY - offsetY - buttonY) * speed;
+
+          bigButton.style.position = "fixed";
+          bigButton.style.left = `${buttonX}px`;
+          bigButton.style.top = `${buttonY}px`;
+          bigButton.style.transform = "none";
+
+          // Animate small buttons - bounce around the screen
+          smallButtons.forEach((btn) => {
+            btn.x += btn.vx;
+            btn.y += btn.vy;
+
+            // Bounce off edges
+            const btnWidth = btn.element.offsetWidth;
+            const btnHeight = btn.element.offsetHeight;
+
+            if (btn.x <= 0 || btn.x >= window.innerWidth - btnWidth) {
+              btn.vx *= -1;
+              btn.x = Math.max(
+                0,
+                Math.min(btn.x, window.innerWidth - btnWidth),
+              );
+            }
+            if (btn.y <= 0 || btn.y >= window.innerHeight - btnHeight) {
+              btn.vy *= -1;
+              btn.y = Math.max(
+                0,
+                Math.min(btn.y, window.innerHeight - btnHeight),
+              );
+            }
+
+            btn.element.style.left = `${btn.x}px`;
+            btn.element.style.top = `${btn.y}px`;
+          });
+        }
+        requestAnimationFrame(animateButton);
+      }
+      animateButton();
+
+      nope.addEventListener("click", () => {
+        if (knopCount === 0) {
+          knopCount++;
+          headline.textContent = `KLIK NOU! het is niet zo moeilijk (${knopCount})`;
+          bigButton.style.padding = "1.3rem 4.5rem";
+          bigButton.style.fontSize = "1.5rem";
+          nope.textContent = "Nee dankje";
+        } else if (knopCount === 1) {
+          knopCount++;
+          headline.textContent = `KOM OP! Bangerik dat je het niet durft (${knopCount})`;
+          bigButton.style.padding = "1.7rem 5.5rem";
+          bigButton.style.fontSize = "1.7rem";
+          nope.textContent = "Geen zin";
+        } else if (knopCount === 2) {
+          knopCount++;
+          headline.textContent = `DOE NIET ZO MOEILIJK! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "2rem 6rem";
+          bigButton.style.fontSize = "2rem";
+          nope.textContent = "Laat me met rust";
+        } else if (knopCount === 3) {
+          knopCount++;
+          headline.textContent = `JE DURFT HET NIET! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "2.5rem 7.5rem";
+          bigButton.style.fontSize = "2.5rem";
+          nope.textContent = "Nee, ik wil niet";
+        } else if (knopCount === 4) {
+          knopCount++;
+          headline.textContent = `JE BENT EEN BANGEBEEST! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "3rem 9rem";
+          bigButton.style.fontSize = "3rem";
+          nope.textContent = "ik heb betere dingen te doen";
+        } else if (knopCount === 5) {
+          knopCount++;
+          headline.textContent = `KOM NOU OP! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "3.5rem 10.5rem";
+          bigButton.style.fontSize = "3.5rem";
+          nope.textContent = "Laat me met rust, ik heb een leven";
+        } else if (knopCount === 6) {
+          knopCount++;
+          headline.textContent = `ALS JE NU NIET KLIKT KRIJG JE PROBLEMEN! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "4rem 12rem";
+          bigButton.style.fontSize = "4rem";
+          nope.textContent = "Nee, ik heb geen zin om op een knop te klikken";
+        } else if (knopCount === 7) {
+          knopCount++;
+          headline.textContent = `KLIKKEN KLIKKEN! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "4.5rem 13.5rem";
+          bigButton.style.fontSize = "4.5rem";
+          nope.textContent = "Nee.";
+        } else if (knopCount === 8) {
+          knopCount++;
+          headline.textContent = `JE BENT EEN BANGEBEEST! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "5rem 15rem";
+          bigButton.style.fontSize = "5rem";
+          nope.textContent = "Nee, ik wil niet";
+        } else if (knopCount === 9) {
+          knopCount++;
+          headline.textContent = `KOM NOU OP! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "5.5rem 16.5rem";
+          bigButton.style.fontSize = "5.5rem";
+          nope.textContent = "Laat me met rust, ik heb een leven";
+        } else if (knopCount === 10) {
+          knopCount++;
+          headline.textContent = `IK GA JE VOLGEN! klik gewoon (${knopCount})`;
+          bigButton.style.padding = "3rem 18rem";
+          bigButton.style.fontSize = "3rem";
+          nope.textContent = "Nee, ik heb geen zin om op een knop te klikken";
+          followMouse = true;
+          setTimeout(() => {
+            mouseFollowActive = true;
+          }, 1);
+          setTimeout(() => {
+            spawnSmallButtons();
+          }, 5000);
+        } else if (knopCount === 11) {
+          knopCount++;
+          headline.textContent = `ZO SNEL KOM JE HIER NIET MEE WEG! klik gewoon (${knopCount})`;
+          spawnSmallButtons();
+        } else if (knopCount === 12) {
+          knopCount++;
+          headline.textContent = `GEEN KANS! klik gewoon (${knopCount})`;
+          spawnSmallButtons();
+        } else if (knopCount === 13) {
+          knopCount++;
+          headline.textContent = `NOOIT DAT JE NU NIET KLIKT OP EEN KNOP! klik gewoon (${knopCount})`;
+          spawnSmallButtons();
+        } else if (knopCount === 14) {
+          knopCount++;
+          headline.textContent = `NU MAAK JE ECHT GEEN KANS! klik gewoon (${knopCount})`;
+          spawnSmallButtons();
+        } else if (knopCount === 15) {
+          knopCount++;
+          headline.textContent = `OMG HOE GOED BEN JIJ KOM OP! klik gewoon (${knopCount})`;
+          spawnSmallButtons();
+        }
+        // TODO: voeg meer levels toe en na een tijdje gaat hij je muis volgen en wordt het bijna onmogelijk om op de knop te klikken
+      });
+
+      function buttonClicked() {
+        window.location.href = "/clicked";
+      }
+    </script>
+  </body>
+</html>
